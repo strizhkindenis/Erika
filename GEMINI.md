@@ -66,3 +66,7 @@ find /var/www/pastes -type f -mmin +1440 -delete
 - **No DB/Backend:** Zero SQL/NoSQL injection surface.
 - **Read-Only / No Traversal:** Clients can only stream new content;
 	existing pastes cannot be modified or traversed via SSH.
+
+## Agent instructions
+
+- Do not use comments because they decay fast and any code should be self explanatory.
