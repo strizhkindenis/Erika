@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+set -e
+
+SERVER="localhost"
+PORT="22"
+
+exec ssh -T -p "$PORT" paste@"$SERVER"
