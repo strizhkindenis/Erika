@@ -5,15 +5,25 @@ for ingestion, Nginx for delivery, and Cron for cleanup.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture Overview
 
-```
-Client -> [SSH] -> server_paste.sh 
-
-server_paste.sh -> /var/www/pastes/ <-> [Nginx] -> Web Browser
-                          ^
-                          | (Hourly Cron Cleanup)
-```
+- Client Ingestion:
+  The client pipes data from `stdin` directly to the server script via an encrypted SSH session.
+- Payload Processing:
+  The server-side script reads the incoming stream and generates a static text file
+  in a designated web-root directory.
+- ID Generation:
+  Each paste is assigned a unique, 4-character alphanumeric ID (e.g., `aB9x`)
+  which serves as the filename.
+- Web Egress:
+  Nginx handles reverse proxying and directly serves the static files
+  from the storage directory over HTTPS.
+- Lifecycle Management (TTL):
+  A automated cron job runs periodically to purge files older than 24 hours,
+  ensuring the service remains ephemeral.
+- Containerization:
+  The entire stack (Nginx, cron, and the processing script) is encapsulated
+  within a Docker container to guarantee portability and trivial deployment.
 
 ---
 
