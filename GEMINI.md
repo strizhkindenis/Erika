@@ -35,10 +35,10 @@ for ingestion, Nginx for delivery, and Cron for cleanup.
 	and public-key auth only.
 - **Forced Command:** Locked down in `authorized_keys` to prevent shell access:
 ```text
-command="/usr/local/bin/server_paste.sh",no-port-forwarding,no-X11-forwarding,no-agent-forwarding <client_pubkey>
+command="/usr/local/bin/server_paste",no-port-forwarding,no-X11-forwarding,no-agent-forwarding <client_pubkey>
 ```
 
-### 2. Ingestion Script `server_paste.sh`
+### 2. Ingestion Script `server_paste`
 
 - Reads raw text from `stdin`.
 - Generates an 8-character random hex ID.

@@ -1,14 +1,7 @@
-# Secure SSH Daemon Configuration for Erika
 Port 22
-Protocol 2
 
-# Host Keys
-HostKey /etc/ssh/ssh_host_rsa_key
-HostKey /etc/ssh/ssh_host_dsa_key
-HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
-# Authentication
 LoginGraceTime 30
 PermitRootLogin no
 StrictModes yes
@@ -18,22 +11,15 @@ PubkeyAuthentication yes
 AuthorizedKeysFile .ssh/authorized_keys
 PasswordAuthentication no
 PermitEmptyPasswords no
-ChallengeResponseAuthentication no
-UsePAM no
+KbdInteractiveAuthentication no
 
-# Hardening & Lockdown
 AllowUsers paste
+DisableForwarding yes
+ForceCommand /usr/local/bin/server_paste
 PermitTTY no
-X11Forwarding no
-AllowTcpForwarding no
-AllowAgentForwarding no
-GatewayPorts no
-PermitTunnel no
 PermitUserEnvironment no
 PrintMotd no
-PrintLastLog no
 TCPKeepAlive yes
 
-# Log levels
 SyslogFacility AUTH
 LogLevel INFO

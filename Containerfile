@@ -8,15 +8,14 @@ RUN rm -rf /etc/nginx/http.d/default.conf
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY sshd_config /etc/ssh/sshd_config
 COPY entrypoint.sh /entrypoint.sh
-COPY server_paste.sh /usr/local/bin/server_paste.sh
+COPY server_paste /usr/local/bin/server_paste
 
-RUN echo "/usr/local/bin/server_paste.sh" >> /etc/shells
-RUN adduser -D -s /usr/local/bin/server_paste.sh paste
+RUN adduser -D paste
 RUN passwd -u paste
 RUN mkdir -p /home/paste/.ssh
 RUN chown -R paste:paste /home/paste/.ssh
 RUN chmod 700 /home/paste/.ssh
-RUN chmod +x /usr/local/bin/server_paste.sh /entrypoint.sh
+RUN chmod +x /usr/local/bin/server_paste /entrypoint.sh
 RUN chown -R nginx:nginx /var/www/pastes
 
 FROM alpine:latest

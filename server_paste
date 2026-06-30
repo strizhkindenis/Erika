@@ -1,4 +1,5 @@
 #!/bin/sh
+
 set -e
 
 PASTE_DIR="/var/www/pastes"
