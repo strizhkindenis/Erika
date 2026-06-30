@@ -16,7 +16,8 @@ RUN mkdir -p /home/paste/.ssh
 RUN chown -R paste:paste /home/paste/.ssh
 RUN chmod 700 /home/paste/.ssh
 RUN chmod +x /usr/local/bin/server_paste /entrypoint.sh
-RUN chown -R nginx:nginx /var/www/pastes
+RUN chown -R paste:nginx /var/www/pastes && chmod 750 /var/www/pastes
+
 
 FROM alpine:latest
 

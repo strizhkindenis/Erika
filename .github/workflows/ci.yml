@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build container
+        run: docker build -t erika:latest -f Containerfile .
+
+      - name: Integration test
+        run: |
+          ssh-keygen -t ed25519 -N "" -f test_key
+          PUBKEY=$(cat test_key.pub)
+          AUTH_LINE="command=\"/usr/local/bin/server_paste\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding $PUBKEY"
+          docker run -d --name erika-test -p 2222:22 -p 8080:80 -e AUTHORIZED_HOSTS="$AUTH_LINE" erika:latest
+          sleep 3
+          LINK=$(echo "hello from integration test" | ssh -i test_key -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null paste@127.0.0.1)
+          CLEAN_URL=$(echo "$LINK" | sed 's|https://localhost/|http://127.0.0.1:8080/|')
+          RESPONSE=$(curl -s "$CLEAN_URL")
+          if [ "$RESPONSE" != "hello from integration test" ]; then
+            echo "Expected: 'hello from integration test', Got: '$RESPONSE'"
+            exit 1
+          fi
+          docker rm -f erika-test
+          rm test_key test_key.pub
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to GHCR
+        if: github.event_name == 'push'
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}
+          IMAGE_ID=$(echo "$IMAGE_ID" | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [ "$VERSION" == "main" ] && VERSION=latest
+          docker tag erika:latest "$IMAGE_ID:$VERSION"
+          docker push "$IMAGE_ID:$VERSION"
+

@@ -6,10 +6,17 @@ ssh-keygen -A
 
 echo "Setting up SSH permissions for paste user..."
 mkdir -p /home/paste/.ssh
-touch /home/paste/.ssh/authorized_keys
+if [ -n "$AUTHORIZED_HOSTS" ]; then
+    echo "$AUTHORIZED_HOSTS" > /home/paste/.ssh/authorized_keys
+elif [ -n "$AUTHORIZED_HOSTS_FILE" ] && [ -f "$AUTHORIZED_HOSTS_FILE" ]; then
+    cat "$AUTHORIZED_HOSTS_FILE" > /home/paste/.ssh/authorized_keys
+else
+    touch /home/paste/.ssh/authorized_keys
+fi
 chown -R paste:paste /home/paste/.ssh
 chmod 700 /home/paste/.ssh
 chmod 600 /home/paste/.ssh/authorized_keys
+
 
 echo "Configuring hourly cleanup cron..."
 echo "0 * * * * find /var/www/pastes -type f -mmin +1440 -delete" > /etc/crontabs/root
